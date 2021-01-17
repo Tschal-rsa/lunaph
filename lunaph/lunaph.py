@@ -5,7 +5,7 @@ Created on Sun Jan 17 16:31:53 2021
 @author: lfz
 """
 
-import cmd, sys, shlex, re
+import cmd, shlex, re
 
 class PoS(object):
     def __init__(self, *, abbr, pos = '', pat = '.*', info = ''):
@@ -140,8 +140,9 @@ class Word(object):
 class Lunaph(cmd.Cmd):
     def __init__(self):
         super(Lunaph, self).__init__()
-        self.intro = 'Lunaph 0.1.0 Alpha'
+        self.intro = 'Lunaph 0.1.0 Alpha (Jan 18 2021)\nType "help" or "?" for more information.'
         self.prompt = '> '
+        self.modified = False
         self.pos = {}
         self.dic = {}
         self.alias = {';': 'exit', 
@@ -167,8 +168,16 @@ class Lunaph(cmd.Cmd):
             f.write(str(dict(pos = [p.to_dict() for p in self.pos.values()], 
                              word = [w.to_dict() for w in self.dic.values()], 
                              alias = self.alias)))
+            self.modified = False
+    
+    def help_save(self):
+        print('You can save your records by inputting an absolute/relative path (with a file name) after the prompt "file> ". If you don\'t include an extension, it will be the default ".ln".')
     
     def do_load(self, dirL):
+        if self.modified:
+            chc = input('Save? [y/n]')
+            if chc == 'y':
+                self.do_save('')
         if dirL == '':
             dirL = input('file> ')
         if '.' not in dirL:
@@ -179,6 +188,9 @@ class Lunaph(cmd.Cmd):
             self.dic = dict([(d['con'], Word(**d)) for d in dictL['word']])
             self.alias.update(dictL['alias'])
     
+    def help_load(self):
+        print('You can load your records by inputting an absolute/relative path (with a file name) after the prompt "file> ". If you don\'t include an extension, it will be the default ".ln".')
+    
     def do_echo(self, con):
         if con == '':
             con = input('con> ')
@@ -187,6 +199,9 @@ class Lunaph(cmd.Cmd):
         else:
             print('Word "%s" doesn\'t exist!' % con)
     
+    def help_echo(self):
+        print('By inputting an existing word, you can see the full information of the word.')
+    
     def do_echop(self, abbr):
         if abbr == '':
             abbr = input('abbr> ')
@@ -194,6 +209,9 @@ class Lunaph(cmd.Cmd):
             print(self.pos[abbr])
         else:
             print('Abbreviation "%s" doesn\'t exist!' % abbr)
+            
+    def help_echop(self):
+        print('By inputting the abbreviation of an existing part of speech, you can see the full information of it.')
     
     def do_add(self, line):
         args = shlex.split(line)
@@ -224,6 +242,16 @@ class Lunaph(cmd.Cmd):
         if '-d' in args or '--def' in args:
             d['info'] = input('def> ')
         self.dic[con] = Word(**d)
+        self.modified = True
+        
+    def help_add(self):
+        print('Alias "d" is the simple mode to add new words. You may input the word (e.g. "lunaph") after the prompt "con> " (or input "d lunaph" at the beginning) and input the meaning(s) after the prompt "nat> ". There is also a complex mode to add new words. Input "+" at the beginning and you can set the part of speech ("pos> "), spelling ("ipa> ") and detailed definition ("def> ") after inputting the word and its meaning. If you want to skip one of the processes, just press enter at the corresponding prompt. If your word doesn\'t match the enforced pattern of your part of speech, you can override the lexical rules by inputting "y".')
+        print('You can also customize the input contents by these flags:')
+        print('"-n" or "--nat" for natlang synonyms (meanings)')
+        print('"-p" or "--pos" for part of speech')
+        print('"-i" or "--ipa" for spelling')
+        print('"-d" or "--def" for definition')
+        print('Therefore, "d" is equivalent to "add -n", and "+" is equivalent to "add -n -p -i -d".')
     
     def do_addp(self, line):
         args = shlex.split(line)
@@ -240,6 +268,16 @@ class Lunaph(cmd.Cmd):
         if '-i' in args or '--info' in args:
             d['info'] = input('info> ')
         self.pos[abbr] = PoS(**d)
+        self.modified = True
+    
+    def help_addp(self):
+        print('By inputting "dp" (or "dp <abbr>"), you can set some parts of speech. You may input a full name (e.g. "noun") after the prompt "pos> " and input a abbreviation (e.g. "n") after the prompt "abbr> ". There is also a complex mode to add new parts of speech. Input "+p" at the beginning (or "+p <abbr>") and you can set the type pattern ("pat> ") and more information ("info> ") after inputting the part of speech and its abbreviation. If you want to skip one of the processes, just press enter at the corresponding prompt.')
+        print('The type pattern of a part of speech is a regular expression that the words must match. For instance, the word "viro" matches the regular expression "o$" or ".*o$" et cetera.')
+        print('You can also customize the input contents by these flags:')
+        print('"-p" or "--pos" for the full name of the part of speech')
+        print('"-t" or "--pat" for the type pattern of the part of speech')
+        print('"-i" or "--info" for the information of the part of speech')
+        print('Therefore, "dp" is equivalent to "addp -p", and "+p" is equivalent to "addp -p -t -i".')
     
     def do_adj(self, line):
         args = shlex.split(line)
@@ -280,6 +318,17 @@ class Lunaph(cmd.Cmd):
             d['info'] = input('new def> ')
         w.reset(**d)
         self.dic[con] = w
+        self.modified = True
+    
+    def help_adj(self):
+        print('Alias "j" is the simple mode to adjust the existing words. After inputting the word you want to adjust, you can set the new word and new meanings. There is also a complex mode to adjust words. Input "=" at the beginning (or "= <word>") and you can set the new part of speech, spelling and definition after setting the word and its meaning. If you want to skip one of the processes, please press enter after the corresponding prompt. Note that inputting "\\" will delete the corresponding record.')
+        print('You can also customize the input contents by these flags:')
+        print('"-c" or "--con" for modifying the conword')
+        print('"-n" or "--nat" for modifying natlang synonyms (meanings)')
+        print('"-p" or "--pos" for modifying the part of speech')
+        print('"-i" or "--ipa" for modifying the spelling')
+        print('"-d" or "--def" for modifying the definition')
+        print('Therefore, "j" is equivalent to "adj -c -n", and "=" is equivalent to "add -c -n -p -i -d".')
     
     def do_adjp(self, line):
         args = shlex.split(line)
@@ -306,22 +355,40 @@ class Lunaph(cmd.Cmd):
             d['info'] = input('new info> ')
         p.reset(**d)
         self.pos[abbr] = p
+        self.modified = True
+    
+    def help_adjp(self):
+        print('Alias "jp" is the simple mode to adjust the existing parts of speech. After inputting the abbreviation of the part of speech you want to adjust, you can set the new name and the new abbreviation. There is also a complex mode to adjust words. Input "=p" at the beginning (or "=p <abbr>") and you can set the new type pattern and extra information after setting the name and its abbreviation. If you want to skip one of the processes, please press enter after the corresponding prompt. Note that inputting "\\" will delete the corresponding record.')
+        print('You can also customize the input contents by these flags:')
+        print('"-a" or "--abbr" for modifying the abbreviation')
+        print('"-p" or "--pos" for modifying the full name of the part of speech')
+        print('"-t" or "--pat" for modifying the type pattern of the part of speech')
+        print('"-i" or "--info" for modifying the information of the part of speech')
+        print('Therefore, "jp" is equivalent to "adjp -a -p", and "=p" is equivalent to "addp -a -p -t -i".')
     
     def do_del(self, con):
         if con == '':
             con = input('con> ')
         if con in self.dic.keys():
             del self.dic[con]
+            self.modified = True
         else:
             print('Word "%s" doesn\'t exist!' % con)
+    
+    def help_del(self):
+        print('You can delete an existing word by inputting the word.')
         
     def do_delp(self, abbr):
         if abbr == '':
             abbr = input('abbr> ')
         if abbr in self.pos.keys():
             del self.pos[abbr]
+            self.modified = True
         else:
             print('Abbreviation "%s" doesn\'t exist!' % abbr)
+    
+    def help_delp(self):
+        print('You can delete an existing part of speech by inputting the abbreviation.')
     
     def do_alias(self, line):
         args = shlex.split(line)
@@ -334,9 +401,20 @@ class Lunaph(cmd.Cmd):
         else:
             txt = input('replace text')
         self.alias[alias] = txt
+        self.modified = True
+    
+    def help_alias(self):
+        print('By inputting the alias and the text you want to replace, you can simplify the commands you use regularly.')
     
     def do_exit(self, line):
-        sys.exit()
+        if self.modified:
+            chc = input('Save? [y/n]')
+            if chc == 'y':
+                self.do_save('')
+        return True
+    
+    def help_exit(self):
+        print('You can exit Lunaph by "exit" or ";".')
     
     def default(self, line):
         print('Unknown command: %s' % line)
@@ -345,7 +423,7 @@ def main():
     try:
         Lunaph().cmdloop()
     except KeyboardInterrupt:
-        sys.exit()
+        pass
     
 if __name__ == '__main__':
     main()
