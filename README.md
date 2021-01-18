@@ -3,9 +3,15 @@ A small language recorder.
 
 ## Update log
 
+- 2021-1-19 0.2.0 Alpha
+
+  1. Feature: directories "lexicon" & "part of speech".
+  2. Feature: cd & ls.
+  3. Optimized code style.
+
 - 2021-1-18 0.1.0 Alpha
 
-  1. In Lunaph, you can type "help" or "?" for more information.
+  1. In Lunaph, you can type "help" or "?" for help document.
   2. Feature: you can add aliases.
   3. Optimized code style.
 
