@@ -130,3 +130,5 @@ dmypy.json
 
 # My configurations
 *.ln
+.lunaph.py.swp
+help.py

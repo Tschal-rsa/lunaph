@@ -3,6 +3,11 @@ A small language recorder.
 
 ## Update log
 
+- 2021-1-20 0.2.1 Alpha
+
+  1. Feature: type "ls /" to show the directories under the root.
+  2. Optimized code style.
+  
 - 2021-1-19 0.2.0 Alpha
 
   1. Feature: directories "lexicon" & "part of speech".
