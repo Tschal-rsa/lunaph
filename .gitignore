@@ -129,6 +129,11 @@ dmypy.json
 .pyre/
 
 # My configurations
-*.ln
+.vscode/
 .lunaph.py.swp
 help.py
+test.py
+tree.py
+*.html
+*.ln
+*.xls

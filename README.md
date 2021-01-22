@@ -1,8 +1,15 @@
 # Lunaph
 A small language recorder.
 
+**Note that Python module** *pyecharts* **is required** (to generate etymology trees).
+
 ## Update log
 
+- 2021-1-22 0.3.0 Alpha
+
+  1. Feature: mkdir, touch, name, stat, etym, import, export, tran.
+  2. Optimized code style.
+  
 - 2021-1-20 0.2.1 Alpha
 
   1. Feature: type "ls /" to show the directories under the root.
@@ -16,7 +23,7 @@ A small language recorder.
 
 - 2021-1-18 0.1.0 Alpha
 
-  1. In Lunaph, you can type "help" or "?" for help document.
+  1. In Lunaph, you can type "help" or "?" for help documents.
   2. Feature: you can add aliases.
   3. Optimized code style.
 
