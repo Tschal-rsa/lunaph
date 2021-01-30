@@ -3,6 +3,8 @@ A small language recorder.
 
 **Note that Python module** *pyecharts* **is required** (to generate etymology trees).
 
+Inspired by PolyGlot.
+
 ## Update log
 
 - 2021-1-22 0.3.0 Alpha
