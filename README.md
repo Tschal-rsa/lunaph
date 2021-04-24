@@ -1,12 +1,15 @@
 # Lunaph
 A small language recorder.
 
-**Note that Python module** *pyecharts* **is required** (to generate etymology trees).
-
 Inspired by PolyGlot.
 
 ## Update log
 
+- 2021-4-24 0.3.1 Alpha
+
+  1. Feature: fuzzy query.
+  2. Disabled etymology tree.
+  
 - 2021-1-22 0.3.0 Alpha
 
   1. Feature: mkdir, touch, name, stat, etym, import, export, tran.

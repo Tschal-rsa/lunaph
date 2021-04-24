@@ -10,10 +10,11 @@ import cmd
 import shlex
 import re
 import os
-from pyecharts.charts import Tree
-from pyecharts import options as opts
+# from pyecharts.charts import Tree
+# from pyecharts import options as opts
 import xlrd
 import xlwt
+import difflib
 
 
 class Focloir(dict):
@@ -73,7 +74,7 @@ class Word(Focloir):
 class Lunaph(cmd.Cmd):
     def __init__(self):
         super(Lunaph, self).__init__()
-        self.intro = 'Lunaph 0.3.0 Alpha (Jan 22 2021)\nType "help" or "?" for help documents.'
+        self.intro = 'Lunaph 0.3.1 Alpha (Apr 24 2021)\nType "help" or "?" for help documents.'
         self.prompt = '/Lexicon$ '
         self.modified = False
         self.cur = 'lex'
@@ -521,6 +522,7 @@ class Lunaph(cmd.Cmd):
     def help_stat(self):
         print(self.help['stat'])
 
+    """
     def etym(self, w: Word) -> dict:
         data = dict(name='{} "{}"'.format(w['con'], w['nat']), children=[])
         for i in w['ep'].keys():
@@ -531,12 +533,14 @@ class Lunaph(cmd.Cmd):
         if data['children'] == []:
             del data['children']
         return data
+    """
 
     def do_etym(self, line):
         if line == '':
             line = input('word> ')
         # print(self.etym(self.doc['lex']['content'][line]))
         print(self.doc['lex']['content'][line].etym())
+        """
         t = (
             Tree()
             .add("", [self.etym(self.doc['lex']['content'][line])], orient="RL")
@@ -544,6 +548,7 @@ class Lunaph(cmd.Cmd):
             .render('{}.html'.format(line))
         )
         print('Successfully generated "{}.html".'.format(line))
+        """
 
     def help_etym(self):
         print(self.help['etym'])
@@ -624,6 +629,14 @@ class Lunaph(cmd.Cmd):
 
     def help_tran(self):
         print(self.help['tran'])
+
+    def do_query(self, line):
+        if line == '':
+            line = input('word> ')
+        print('\t'.join(difflib.get_close_matches(line, self.doc['lex']['content'].keys(), 5)))
+    
+    def help_query(self):
+        print(self.help['query'])
 
     def do_exit(self, line):
         if self.modified:
